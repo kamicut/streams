@@ -28,7 +28,7 @@ var x = $$(crazy_long_computation, args)
 
 Stream Construction
 -----------------
-A Stream constructor takes an element and a suspended computation, to construct the list of fibonacci elements:
+A Stream constructor takes an element and a suspended computation. To construct the list of fibonacci elements:
 ```javascript
 function fibonacci() {
 	function loop(h,n) {
