@@ -138,7 +138,7 @@ function fibonacci() {
 	function loop(h,n) {
 		return Stream.Stream(n, $$(loop, [n, h+n]))
 	}
-	return loop(1,1)
+	return loop(0,1)
 }
 
 function primes() {

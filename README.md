@@ -3,7 +3,7 @@ A small library of functions to implement suspensions and streams based on the i
 Examples
 --------
 
-To create the stream of natural numbers (in JS):
+With suspensions and streams you can easily work with infinite sequences! To create the stream of natural numbers (in JS):
 ```javascript
 var ns = Stream.From(0);
 ```
