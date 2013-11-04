@@ -1,18 +1,17 @@
 function Susp(thunk) {
+	this.evaled = false
 	this.memo = function() {
 		var ev = thunk() 
-		this.memo = function() {
-			return ev
-		}
+		this.evaled = true
+		this.memo = ev
 		return ev
 	}
-	this.force = function() {
-		return this.memo() 
-	}}
+}
 
 function force(susp) {
 	if (susp instanceof Susp) {
-		return susp.force()
+		if (susp.evaled) return susp.memo
+		else return susp.memo()
 	}}
 
 function $$(f, args) {
@@ -46,7 +45,7 @@ var Stream = (function() {
 	function isNil(x) { return (typeof x === "undefined") }
 
 	Cons.prototype.head = function() {return this.hd}
-	Cons.prototype.tail = function() {return this.tl.force()}
+	Cons.prototype.tail = function() {return force(this.tl)}
 	Cons.prototype.toList = function() {
 		function loop(cons) { 
 			if (isNil(cons)) return []
@@ -151,9 +150,12 @@ function fibonacci() {
 
 function primes() {
 	function sieve(stream) {
-		var head = stream.head(), tail = stream.tail()
-		var sift = function(e) { return (e%head) != 0}
-		return Stream.Stream(head, $$(sieve, tail.filter(sift)))	
+		var head = stream.head();
+		return Stream.Stream(head, $$(sieve, stream.tail().filter(function(e) {
+			return (e%head) != 0 
+		})))	
 	}	
 	return sieve(Stream.From(2))
 }
+
+var ns = Stream.From(0)
