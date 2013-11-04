@@ -1,4 +1,11 @@
-A small library of functions to implement suspensions and streams based on the ideas in [this](https://www.cs.cmu.edu/~rwh/introsml/techniques/memoization.htm) manual. I also try to introduce an operator for $-Notation as in [here](https://www.cs.cmu.edu/~rwh/theses/okasaki.pdf).
+Motivation
+==========
+
+A small library of functions to implement suspensions and streams based on the ideas in [this](https://www.cs.cmu.edu/~rwh/introsml/techniques/memoization.htm) manual. I also try to introduce an operator for $-Notation as in [here](https://www.cs.cmu.edu/~rwh/theses/okasaki.pdf). 
+
+A stream is similar to a list, but it is a sequence of delayed data elements. This means that the later elements are only calculated on demand, and not when the list is created. Streams can therefore represent an infinite sequence or series. 
+
+A suspension is a delayed computation of an expression. We create a suspension by wrapping the function to be evaluated with the $$(fn) operator. Thus it won't be evaluated until we need it to be. The result will then be stored for later retrieval. Suspensions are used to create streams from regular elements. 
 
 Examples
 ========
@@ -22,14 +29,18 @@ Suspensions
 
 To suspend a computation, use the `$$` operation in the form `$$(fun, args)`. You can then evaluate the computation with `force()`, the result will be memoized.
 ```javascript
-var x = $$(crazy_long_computation, args)
+function crazy_computation(arg1, arg2, arg3) {
+	//do alot of stuff
+}
+
+var x = $$(crazy_computation, [arg1, arg2, arg3])
 force(x) //will evaluate the computation
 force(x) //2nd time, will retrieve the stored result
 ```
 
 Stream Construction
 -----------------
-A Stream constructor takes an element and a suspended computation. To construct the list of fibonacci elements:
+A Stream constructor takes an element and a suspended computation that will generate a new stream. To construct the list of fibonacci elements, we need a loop that generates a stream and appends it to the previous stream.
 ```javascript
 function fibonacci() {
 	function loop(h,n) {
@@ -43,7 +54,7 @@ Notice that we suspend the loop function so as to not evaluate it until we actua
 var fibs = fibonacci()
 var fibonacci_number_50 = fibs.apply(50) //returns 12586269025
 ```
-Since the evaluation of the stream is lazy, the results are stored and we can now do `fibs.apply(1)`, `fibs.apply(2)`,`...,fibs.apply(50)` at no additional cost. 
+Since the evaluation of the stream is on lazy, the results are stored and we can now do `fibs.apply(1)`, `fibs.apply(2)`,`...,fibs.apply(50)` at no additional cost. 
 
 Primes
 ------
