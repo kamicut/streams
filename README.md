@@ -1,30 +1,34 @@
 A small library of functions to implement suspensions and streams based on the ideas in [this](https://www.cs.cmu.edu/~rwh/introsml/techniques/memoization.htm) manual. I also try to introduce an operator for $-Notation as in [here](https://www.cs.cmu.edu/~rwh/theses/okasaki.pdf).
 
 Examples
---------
+========
+The following examples will be in javascript
 
-With suspensions and streams you can easily work with infinite sequences! To create the stream of natural numbers (in JS):
-```javascript
-var ns = Stream.From(0);
-```
+Infinite Sequences
+------------------
 
-To get the multiples of 2 and filter out multiples of 4:
+With suspensions and streams you can easily work with infinite sequences! Here we create the stream of natural numbers, then get the multiples of 2 and filter out the multiples of 4. Finally we take 5 elements and return a list:
 ```javascript
-ns.map(function(e) {return e*2}).filter(function(e) {return e%4 != 0})
-```
+var ns = Stream.From(0); //Natural numbers
 
-To take a few numbers and output to a list:
-```javascript
-ns.take(5).toList()
+ns.map(function(e) {return e*2})
+	.filter(function(e) {return e%4 != 0})
+	.take(5)
+	.toList()
 ```
-will return [0,1,2,3,4]
+will return `[2, 6, 10, 14, 18]`
+
+Suspensions
+-----------
 
 To suspend a computation, use the `$$` operation in the form `$$(fun, args)`
 ```javascript
 var x = $$(crazy_long_computation, args)
 ```
 
-A Stream constructor takes an element and a suspended computation, to construct the list of fibonacci elements:
+Stream Construction
+-----------------
+A Stream constructor takes an element and a suspended computation. To construct the list of fibonacci elements:
 ```javascript
 function fibonacci() {
 	function loop(h,n) {
