@@ -2,7 +2,7 @@ A small library of functions to implement suspensions and streams based on the i
 
 Examples
 ========
-The following examples will be in javascript
+The following examples are in javascript.
 
 Infinite Sequences
 ------------------
@@ -14,16 +14,17 @@ var ns = Stream.From(0); //Natural numbers
 ns.map(function(e) {return e*2})
 	.filter(function(e) {return e%4 != 0})
 	.take(5)
-	.toList()
+	.toList() // Returns [2, 6, 10, 14, 18]
 ```
-will return `[2, 6, 10, 14, 18]`
 
 Suspensions
 -----------
 
-To suspend a computation, use the `$$` operation in the form `$$(fun, args)`
+To suspend a computation, use the `$$` operation in the form `$$(fun, args)`. You can then evaluate the computation with `force()`, the result will be memoized.
 ```javascript
 var x = $$(crazy_long_computation, args)
+force(x) //will evaluate the computation
+force(x) //2nd time, will retrieve the stored result
 ```
 
 Stream Construction
@@ -37,12 +38,16 @@ function fibonacci() {
 	return loop(0,1)
 }
 ```
-Notice that we suspend the loop function so as to not evaluate it until we actually want to compute it. Thus we can now do something like this:
+Notice that we suspend the loop function so as to not evaluate it until we actually want to compute it. We can now the following:
 ```javascript
-var prime_number_1000 = fibonacci().apply(1000)
+var fibs = fibonacci()
+var fibonacci_number_50 = fibs.apply(50) //returns 12586269025
 ```
+Since the evaluation of the stream is lazy, the results are stored and we can now do `fibs.apply(1)`, `fibs.apply(2)`,`...,fibs.apply(50)` at no additional cost. 
 
-Finally, to construct all primes, use the sieve of Erastothenes coupled with some functional magic! 
+Primes
+------
+Finally, to construct all primes, use the sieve of Eratosthenes coupled with some functional magic! 
 ```javascript
 function primes() {
 	function sieve(stream) {
