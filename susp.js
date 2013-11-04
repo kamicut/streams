@@ -86,10 +86,17 @@ var Stream = (function() {
 			else {
 				var cons = force(susp)
 				if (isNil(cons)) return nil
-				else return drop(n-1, cons.tl)
+				else return function() {return drop(n-1, cons.tl)}
 			}
 		}
-		return force(drop(n, $$(this)))
+		function trampoline(dr, n, susp) {
+			var result = dr(n, susp)
+			while (!(result instanceof Susp) && !(isNil(result))) {
+				result = result();
+			}
+			return result
+		}
+		return force(trampoline(drop, n, $$(this)))
 	}
 
 	function from(n, iter) {
@@ -133,6 +140,7 @@ var Stream = (function() {
 	
 	return StreamObj
 })()
+
 
 function fibonacci() {
 	function loop(h,n) {
