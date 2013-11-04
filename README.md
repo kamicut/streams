@@ -47,14 +47,32 @@ Since the evaluation of the stream is lazy, the results are stored and we can no
 
 Primes
 ------
-Finally, to construct all primes, use the sieve of Eratosthenes coupled with some functional magic! 
+Let's use the sieve of Eratosthenes coupled with some functional magic for a more involved example.
 ```javascript
 function primes() {
+	//Returns a function to pass into the stream filter that will 
+	//remove all the multiples of the first element in the stream
+	function notMultipleof(h) { 
+		return function(e) {
+			return (e%h) != 0 
+		}
+	} 
+	//Create a sieve out of a stream
 	function sieve(stream) {
-		var head = stream.head(), tail = stream.tail()
-		var sift = function(e) { return (e%head) != 0}
-		return Stream.Stream(head, $$(sieve, tail.filter(sift)))	
+		//Take the first element
+		var head = stream.head();
+
+		//Use it to sift the rest of the list
+		var siftedStream = stream.tail().filter(notMultipleof(head))
+
+		//Append the first element to the sifted list and recurse on
+		//the sifted list
+		return Stream.Stream(head, $$(sieve, siftedStream))	
 	}	
+	//Start with the list of consecutive integers starting from 2
 	return sieve(Stream.From(2))
 }
+
+var p = primes()
+p.apply(2000) //Will return the 2000th prime: 17389
 ```
