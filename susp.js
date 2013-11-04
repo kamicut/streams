@@ -149,13 +149,16 @@ function fibonacci() {
 }
 
 function primes() {
+	function notMultipleof(h) {
+		return function(e) {
+			return (e%h) != 0 
+		}
+	} 
+
 	function sieve(stream) {
 		var head = stream.head();
-		return Stream.Stream(head, $$(sieve, stream.tail().filter(function(e) {
-			return (e%head) != 0 
-		})))	
+		var nextStream = stream.tail().filter(notMultipleof(head))
+		return Stream.Stream(head, $$(sieve, nextStream))	
 	}	
 	return sieve(Stream.From(2))
 }
-
-var ns = Stream.From(0)
