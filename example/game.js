@@ -41,6 +41,13 @@ function Path(history) {
 	this.endState = function() {
 		return this.history[this.history.length - 1]
 	}
+	this.makesLoop = function(move) {
+		var ret = false;
+		for (var i=1; i<this.history.length; i++) {
+			ret = ret || this.history[i].equals(move);
+		}
+		return ret
+	}
 }
 
 // For each current set of paths, extend them with the possible
@@ -51,7 +58,9 @@ function allPaths(pathList) {
 		var nextPositions = possibleMoves(path.endState())
 
 		nextPositions.forEach(function(position) {
-			nextPaths.push(path.extend(position));
+			if (!path.makesLoop(position)) {
+				nextPaths.push(path.extend(position))
+			}
 		})
 	})
 
