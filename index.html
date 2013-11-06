@@ -4,15 +4,15 @@
 <p>
 Knight's move example. Choose a starting and end position and calculate the shortest path using chess knight movement. 
 
-The solution is implemented using streams to get all combinatorial paths. You can check out the code <a href="https://github.com/kamicut/streams/blob/master/example/game.js">here!</a>
+The solution is implemented using infinite lists (called streams) to get all combinatorial paths. You can check out the code <a href="https://github.com/kamicut/streams/blob/master/example/game.js">here!</a>
 </p>
 
 <form onsubmit="return false" oninput="o.value =
 '('+startx.value+','+starty.value+')'">
 <p>
 	Starting position: 
-	x: <input type=range min=0 max=6 value=1 id="startx">
-	y: <input type=range min=0 max=6 value=2 id="starty">
+	x: <input type=range min=1 max=8 value=1 id="startx">
+	y: <input type=range min=1 max=8 value=2 id="starty">
 	<output	name="o" style="margin:10" for="startx starty">(1,2)</output>
 </p>
 </form>
@@ -20,8 +20,8 @@ The solution is implemented using streams to get all combinatorial paths. You ca
 '('+endx.value+','+endy.value+')'">
 <p>
 	End position: 
-	x: <input type=range min=0 max=6 value=3 id="endx">
-	y: <input type=range min=0 max=6 value=4 id="endy">
+	x: <input type=range min=1 max=8 value=3 id="endx">
+	y: <input type=range min=1 max=8 value=4 id="endy">
 	<output	name="o" style="margin:10" for="endx endy">(3,4)</output>
 </p>
 </form>
@@ -29,7 +29,7 @@ The solution is implemented using streams to get all combinatorial paths. You ca
 '('+solutions.value+')'">
 <p>
 	Number of solutions
-	<input type=range min=1 max=7 value=1 id="solutions">
+	<input type=range min=1 max=40 value=1 id="solutions">
 	<output	style="margin:10" name="o" for="solutions">(1)</output>
 </p>
 </form>
@@ -49,7 +49,8 @@ The solution is implemented using streams to get all combinatorial paths. You ca
 		console.log("("+startx+", "+starty+")");
 		console.log("("+endx+", "+endy+")");
 		console.log("#: "+solutions);
-		game(new Pos(startx, starty), new Pos(endx, endy),
+		game(new Pos(parseInt(startx), parseInt(starty)), 
+			new Pos(parseInt(endx), parseInt(endy)),
 			solutions, arena)
 	}
 </script>
