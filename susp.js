@@ -137,7 +137,7 @@ var Stream = (function() {
 							return new Cons(cons.hd, filter(f,cons.tl))
 						})
 					}
-					else {return trampoline(filter, f, cons.tl)}	
+					else {return filter(f, cons.tl)}	
 				}
 		}
 		return force(filter(f, $$(this)))
