@@ -60,7 +60,9 @@ var Stream = (function() {
 	
 	function trampoline(fn, n, susp) {
 		var result = fn(n, susp)
+		//console.log(result)
 		while (!(result instanceof Array) &&
+			!(result instanceof Cons) &&
 			!(result instanceof Susp) && !(isNil(result))) {
 			result = result();
 		}
@@ -130,17 +132,15 @@ var Stream = (function() {
 	Cons.prototype.filter = function(f) {
 		function filter(f, susp) {
 				var cons = force(susp);
-				if (isNil(cons)) { return $$(Stream.Nil) }
+				if (isNil(cons)) { return Stream.Nil }
 				else {
 					if (f(cons.hd)) {
-						return $$(function() {
-							return new Cons(cons.hd, filter(f,cons.tl))
-						})
+						return new Cons(cons.hd, $$(trampoline, [filter,f,cons.tl]))
 					}
-					else {return filter(f, cons.tl)}	
+					else {return function() { return filter(f, cons.tl)} }	
 				}
 		}
-		return force(filter(f, $$(this)))
+		return trampoline(filter, f, $$(this))
 	}
 
 	Cons.prototype.map = function(f) {
