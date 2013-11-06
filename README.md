@@ -1,7 +1,7 @@
 Motivation
 ==========
 
-A small library of functions to implement suspensions and streams based on the ideas in [this](https://www.cs.cmu.edu/~rwh/introsml/techniques/memoization.htm) manual. I also try to introduce an operator for $-Notation as in [here](https://www.cs.cmu.edu/~rwh/theses/okasaki.pdf). 
+A small library of functions to implement suspensions and streams (infinite lists) based on the ideas in [this](https://www.cs.cmu.edu/~rwh/introsml/techniques/memoization.htm) manual. I also try to introduce an operator for $-Notation as in [here](https://www.cs.cmu.edu/~rwh/theses/okasaki.pdf). 
 
 A stream is similar to a list, but it is a sequence of delayed data elements. This means that the later elements are only calculated on demand, and not when the list is created. Streams can therefore represent an infinite sequence or series. 
 
