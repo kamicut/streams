@@ -87,3 +87,24 @@ function primes() {
 var p = primes()
 p.apply(2000) //Will return the 2000th prime: 17389
 ```
+
+Combinatorial Search
+--------------------
+A problem like finding the shortest path between two points can elegantly be described using streams. On [this](http://kamicut.github.io/streams/) page I show an example of using streams for combinatorial search. Here's a sample:
+```javascript
+// For each current set of paths, extend them with the possible
+// moves and append to the stream
+function allPaths(pathList) {
+	var nextPaths = []
+	pathList.forEach(function(path) {
+		var nextPositions = possibleMoves(path.endState())
+
+		nextPositions.forEach(function(position) {
+			if (!path.makesLoop(position))
+				nextPaths.push(path.extend(position))
+		})
+	})
+
+	return Stream.Stream(nextPaths, $$(allPaths, nextPaths))
+}
+```
