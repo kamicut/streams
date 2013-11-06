@@ -57,23 +57,37 @@ var Stream = (function() {
 
 	Cons.prototype.head = function() {return this.hd}
 	Cons.prototype.tail = function() {return force(this.tl)}
+	
+	function trampoline(fn, n, susp) {
+		var result = fn(n, susp)
+		while (!(result instanceof Array) &&
+			!(result instanceof Susp) && !(isNil(result))) {
+			result = result();
+		}
+		return result
+	}
+
 	Cons.prototype.toList = function() {
 		function loop(cons, acc) { 
 			if (isNil(cons)) return acc
 			else {
 				var next = force(cons.tl)
-				return loop(next, acc.concat([cons.hd]))
+				return function() {return loop(next, acc.concat([cons.hd]))}
 			}
 		}
-		return loop(this, [])
+		return trampoline(loop, this, [])
 	}
 
 	function ListToCons(lst) {
-		if (lst.length == 0) return Stream.Nil
-		else {
-			var hd = lst[0], tl = lst.splice(1,lst.length-1)
-			return new Cons(hd, $$(ListToCons(tl)))
+		function loop(lst, acc) {
+			if (lst.length == 0) return $$(acc)
+			else { 
+				var hd = lst[0]; tl = lst.slice(1)
+				var cons = new Cons(hd, $$(acc))
+				return function() { return loop(tl, cons) }
+			}
 		}
+		return force(trampoline(loop, lst.reverse(), Stream.Nil))
 	}
 
 	Cons.prototype.take = function(n) {
@@ -90,13 +104,6 @@ var Stream = (function() {
 		return force(take(n, $$(this)))
 	}
 
-	function trampoline(fn, n, susp) {
-		var result = fn(n, susp)
-		while (!(result instanceof Susp) && !(isNil(result))) {
-			result = result();
-		}
-		return result
-	}
 	
 	Cons.prototype.drop = function(n) {
 		function drop(n, susp) {
