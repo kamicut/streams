@@ -32,33 +32,44 @@ var isFunction = function(obj) {
 var Stream = (function() {
 	var StreamObj = {
 		Stream: function(a, susp) {return new Cons(a, susp)},
-		FromList: function(lst) { return ListToCons(lst)},
+		FromList: function(lst) { return ListToCons(lst.slice(0)) },
 		From: function(n, iter) { return from(n, iter)},
 		Append: function(a, stream) { return new Cons(a, $$(stream))},
-		Range: function(lo, hi, iter) {return range(lo,hi,iter)}
+		Range: function(lo, hi, iter) {return range(lo,hi,iter)},
+		Concat: function(stream1, stream2) {
+			if (!(stream1 instanceof Susp) || !(stream2 instanceof Susp))
+				throw new Error("need suspensions in both arguments")
+			else {
+				var cons = force(stream1)
+				if (isNil(cons)) return force(stream2)
+				else return new Cons(cons.head(), $$(Stream.Concat,
+						[cons.tl, stream2]
+					))
+			}
+		},
+		Nil: undefined 
 	}
 	function Cons(a, susp) { 
 		this.hd = a,
 		this.tl = susp
 	}
-	var nil = undefined
 	function isNil(x) { return (typeof x === "undefined") }
 
 	Cons.prototype.head = function() {return this.hd}
 	Cons.prototype.tail = function() {return force(this.tl)}
 	Cons.prototype.toList = function() {
-		function loop(cons) { 
-			if (isNil(cons)) return []
+		function loop(cons, acc) { 
+			if (isNil(cons)) return acc
 			else {
 				var next = force(cons.tl)
-				return [cons.hd].concat(loop(next))
+				return loop(next, acc.concat([cons.hd]))
 			}
 		}
-		return loop(this)
+		return loop(this, [])
 	}
 
 	function ListToCons(lst) {
-		if (lst.length == 0) return nil
+		if (lst.length == 0) return Stream.Nil
 		else {
 			var hd = lst[0], tl = lst.splice(1,lst.length-1)
 			return new Cons(hd, $$(ListToCons(tl)))
@@ -68,15 +79,23 @@ var Stream = (function() {
 	Cons.prototype.take = function(n) {
 		function take(n, susp) {
 			return $$(function() {
-				if (n == 0) { return nil}
+				if (n == 0) { return Stream.Nil}
 				else {
 					var cons = force(susp);
-					if (isNil(cons)) return nil
+					if (isNil(cons)) return Stream.Nil
 					else return new Cons(cons.hd, take(n-1, cons.tl))
 				}
 			})
 		}
 		return force(take(n, $$(this)))
+	}
+
+	function trampoline(fn, n, susp) {
+		var result = fn(n, susp)
+		while (!(result instanceof Susp) && !(isNil(result))) {
+			result = result();
+		}
+		return result
 	}
 	
 	Cons.prototype.drop = function(n) {
@@ -84,16 +103,9 @@ var Stream = (function() {
 			if (n == 0) {return susp}
 			else {
 				var cons = force(susp)
-				if (isNil(cons)) return nil
-				else return function() {return drop(n-1, cons.tl)}
+				if (isNil(cons)) return Stream.Nil
+				else return function() {return drop(n-1,cons.tl)}
 			}
-		}
-		function trampoline(dr, n, susp) {
-			var result = dr(n, susp)
-			while (!(result instanceof Susp) && !(isNil(result))) {
-				result = result();
-			}
-			return result
 		}
 		return force(trampoline(drop, n, $$(this)))
 	}
@@ -104,20 +116,22 @@ var Stream = (function() {
 	}
 	function range(lo, hi, iter) {
 		var iter = iter || function(e) {return e+1}
-		if (lo > hi) return nil
+		if (lo > hi) return Stream.Nil
 		else return new Cons(lo, $$(range(iter(lo), hi, iter)))
 	}
 
 	Cons.prototype.filter = function(f) {
 		function filter(f, susp) {
-			return $$(function() {
 				var cons = force(susp);
-				if (isNil(cons)) { return nil }
+				if (isNil(cons)) { return $$(Stream.Nil) }
 				else {
-					if (f(cons.hd)) {return new Cons(cons.hd, filter(f,cons.tl))}
-					else {return force(filter(f, cons.tl))}
+					if (f(cons.hd)) {
+						return $$(function() {
+							return new Cons(cons.hd, filter(f,cons.tl))
+						})
+					}
+					else {return trampoline(filter, f, cons.tl)}	
 				}
-			})
 		}
 		return force(filter(f, $$(this)))
 	}
@@ -126,7 +140,7 @@ var Stream = (function() {
 		function map(f, susp) {
 			return $$(function() {
 				var cons = force(susp);
-				if (isNil(cons)) {return nil }
+				if (isNil(cons)) {return Stream.Nil }
 				else {
 					return new Cons(f(cons.hd), map(f, cons.tl))
 				}
