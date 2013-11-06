@@ -1,0 +1,45 @@
+<script src="../susp.js"></script>
+<script src="game.js"></script>
+
+<p>
+Knight's move example. Choose a starting and end position and calculate the shortest path using chess knight movement.
+</p>
+
+<form>
+<p>
+	Starting position: 
+	x: <input type=range min=0 max=7 id="startx">
+	y: <input type=range min=0 max=7 id="starty">
+</p>
+<p>
+	End position: 
+	x: <input type=range min=0 max=7 id="endx">
+	y: <input type=range min=0 max=7 id="endy">
+</p>
+<p>
+	Number of solutions
+	<input type=range min=1 max=5 id="solutions">
+</p>
+<input type=button value="submit" id="run">
+</form>
+<div id="arena"></div>
+
+<script >
+	document.getElementById("run").onclick = function() {
+		var arena = document.getElementById("arena")
+		arena.innerHTML = ""
+
+		var startx = document.getElementById("startx").value;
+		var starty = document.getElementById("starty").value;
+		var endx = document.getElementById("endx").value;
+		var endy = document.getElementById("endy").value;
+		var solutions = document.getElementById("solutions").value
+		console.log(startx);
+		console.log(starty);
+		console.log(endx);
+		console.log(endy);
+		console.log(solutions);
+		game(new Pos(startx, starty), new Pos(endx, endy),
+			solutions, arena)
+	}
+</script>
