@@ -74,13 +74,11 @@ fun map(f, stream: 'a Stream susp) =
   )
 
 fun filter(f, stream: 'a Stream susp) =
-  delay(fn () =>
     case force(stream) of
-      Nil => Nil
+      Nil => delay(fn() => Nil)
     | Cons(x, stream') => if f(x) 
-                          then Cons(x, filter(f, stream'))
-                          else force(filter(f, stream'))
-  )
+                          then delay(fn() => Cons(x, filter(f, stream')))
+                          else filter(f, stream')
 
 fun apply(n: int, stream: 'a Stream susp) =
   if (n <= 0) then lhd (stream)
@@ -95,3 +93,12 @@ fun sieve(seq) =
     Cons(head, delay(fn() => sieve(filter(filt, tail))))
   end
 
+fun fromList(lst: 'a list): 'a Stream = 
+  case lst of 
+    [] => Nil
+  | h::t => Cons(h, delay(fn() => fromList(t)))
+
+fun concatenate(s1: 'a Stream susp, s2: 'a Stream susp) =
+    case force(s1) of
+      Nil => force(s2)
+    | Cons(h, t) => Cons(h, delay(fn() => concatenate(t, s2)))
