@@ -11,8 +11,10 @@ function Pos(x, y) {
 }
 
 // Given a position, what are the possible next positions
-function possibleMoves(pos, lo, hi) {
-	var lo = lo || -Infinity; var hi = hi || Infinity
+function possibleMoves(pos, range) {
+	var range = range || [-Infinity, Infinity]
+	var lo = range[0]; var hi = range[1]
+
 	var possible = [
 		new Pos(pos.x+2, pos.y+1),
 		new Pos(pos.x-2, pos.y-1),
@@ -24,12 +26,11 @@ function possibleMoves(pos, lo, hi) {
 		new Pos(pos.x+1, pos.y-2)
 	]
 
-	ret = []
-	possible.forEach(function(move) {
-		if (move.x <= hi && move.x >= lo && move.y >= lo && move.y <= hi) 
-			ret.push(move)
-	})
-	return ret
+	var inRange = function(move) { 
+		return (move.x <= hi && move.x >= lo && 
+			move.y >= lo && move.y <= hi) 
+	}
+	return possible.filter(inRange)
 }
 
 // A path is a list of positions
@@ -53,18 +54,17 @@ function Path(history) {
 
 // For each current set of paths, extend them with the possible
 // moves and append to the stream
-function allPaths(pathList, lo, hi) {
+function allPaths(pathList, range) {
 	var nextPaths = []
 	pathList.forEach(function(path) {
-		var nextPositions = possibleMoves(path.endState(), lo, hi)
+		var nextPositions = possibleMoves(path.endState(), range)
 
 		nextPositions.forEach(function(position) {
 			nextPaths.push(path.extend(position));
 		})
 	})
 
-	return Stream.Stream(nextPaths, 
-		$$(allPaths, [nextPaths, lo, hi])
+	return Stream.Stream(nextPaths, $$(allPaths, [nextPaths, range])
 	)
 }
 
@@ -90,12 +90,9 @@ function solutions(pathLists, target) {
 //We can call this function to get a stream of solutions 
 //from fromPos to toPos and print out a number of solutions
 function game(fromPos, toPos, numSolutions, id, range) {
-	var lo = 1, hi = 8
-	if (typeof range != "undefined") { lo = range[0]; hi = range[1] }
-
 	var numSolutions = numSolutions || 5
 	var initialPath = new Path([fromPos]);
-	var pathLists = allPaths([initialPath], lo, hi);
+	var pathLists = allPaths([initialPath], range);
 	var allSolutions = solutions(pathLists, toPos);
 	allSolutions
 		.take(numSolutions)

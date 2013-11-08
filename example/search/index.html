@@ -46,11 +46,9 @@ The solution is implemented using infinite lists (called streams) to get all com
 		var endx = document.getElementById("endx").value;
 		var endy = document.getElementById("endy").value;
 		var solutions = document.getElementById("solutions").value
-		console.log("("+startx+", "+starty+")");
-		console.log("("+endx+", "+endy+")");
-		console.log("#: "+solutions);
+
 		game(new Pos(parseInt(startx), parseInt(starty)), 
 			new Pos(parseInt(endx), parseInt(endy)),
-			solutions, arena)
+			solutions, arena, [1,8])
 	}
 </script>
