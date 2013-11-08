@@ -89,8 +89,13 @@ function solutions(pathLists, target) {
 
 //We can call this function to get a stream of solutions 
 //from fromPos to toPos and print out a number of solutions
-function game(fromPos, toPos, numSolutions, id, range) {
-	var numSolutions = numSolutions || 5
+function game(params) {
+	var params = params || {}
+	var fromPos = params.from || new Pos(1,1), 
+		toPos 	= params.to || new Pos(4,4), 
+		numSolutions = params.num || 5, 
+		id = params.id, 
+		range = params.range;
 	var initialPath = new Path([fromPos]);
 	var pathLists = allPaths([initialPath], range);
 	var allSolutions = solutions(pathLists, toPos);
