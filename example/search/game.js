@@ -60,7 +60,7 @@ function allPaths(pathList, range) {
 		var nextPositions = possibleMoves(path.endState(), range)
 
 		nextPositions.forEach(function(position) {
-			nextPaths.push(path.extend(position));
+				nextPaths.push(path.extend(position));
 		})
 	})
 
@@ -89,10 +89,8 @@ function solutions(pathLists, target) {
 
 //We can call this function to get a stream of solutions 
 //from fromPos to toPos and print out a number of solutions
-function game(params) {
+function game(fromPos, toPos, params) {
 	var params = params || {}
-	var fromPos = params.from || new Pos(1,1), 
-		toPos 	= params.to || new Pos(4,4), 
 		numSolutions = params.num || 5, 
 		id = params.id, 
 		range = params.range;

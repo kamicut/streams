@@ -47,12 +47,12 @@ The solution is implemented using infinite lists (called streams) to get all com
 		var endy = document.getElementById("endy").value;
 		var solutions = document.getElementById("solutions").value
 
-		game({
-			from: new Pos(parseInt(startx), parseInt(starty)), 
-			to: new Pos(parseInt(endx), parseInt(endy)),
-			num: solutions, 
-			id: arena, 
-			range: [1,8]
-		})
+		game(new Pos(parseInt(startx), parseInt(starty)), 
+			new Pos(parseInt(endx), parseInt(endy)),
+			{ 
+				num: solutions, 
+				id: arena, 
+				range: [1,8]
+			})
 	}
 </script>
